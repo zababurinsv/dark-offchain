@@ -1,15 +1,12 @@
-import { AnySubsocialData, PostWithAllDetails, ProfileData, SpaceData } from '@subsocial/types'
-import { newLogger, isEmptyArray } from '@subsocial/utils'
+import { newLogger, isEmptyArray } from '@darkpay/dark-utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
-import * as BN from 'bn.js'
-import { resolveSubsocialApi } from '../connections/subsocial'
 import {
   ElasticIndex,
   ElasticIndexTypes,
   AllElasticIndexes,
   ElasticFields,
   ElasticQueryParams,
-} from '@subsocial/types/offchain/search'
+} from '@darkpay/dark-types/offchain/search'
 
 const log = newLogger('Elastic Reader')
 
@@ -37,24 +34,27 @@ export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
   }
 
   const tagFields = [
-    ElasticFields.space.tags,
-    ElasticFields.post.tags
+    ElasticFields.storefront.tags,
+    ElasticFields.product.tags
   ]
 
   const searchFields = [
-    `${ElasticFields.space.name}^3`,
-    `${ElasticFields.space.handle}^2`,
-    `${ElasticFields.space.about}^1`,
-    `${ElasticFields.space.tags}^2`,
+    `${ElasticFields.storefront.name}^3`,
+    `${ElasticFields.storefront.handle}^2`,
+    `${ElasticFields.storefront.about}^1`,
+    `${ElasticFields.storefront.tags}^2`,
 
-    `${ElasticFields.post.title}^3`,
-    `${ElasticFields.post.body}^1`,
-    `${ElasticFields.post.tags}^2`,
+    `${ElasticFields.product.title}^3`,
+    `${ElasticFields.product.body}^1`,
+    `${ElasticFields.product.tags}^2`,
 
     `${ElasticFields.comment.body}^2`,
 
     `${ElasticFields.profile.name}^3`,
     `${ElasticFields.profile.about}^1`,
+
+    `${ElasticFields.ordering.orderingcontent_total}^3`,
+    `${ElasticFields.ordering.orderingcontent_state}^1`,
   ]
 
   const isEmptyQuery = q === '*' || q.trim() === ''
@@ -96,104 +96,4 @@ export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
   log.debug('Final ElasticSearch query:', searchReq)
 
   return searchReq
-}
-
-type EsDataResults = {
-  _id: string
-  _index: string
-}
-
-const fillArray = <T extends string | BN>(
-  id: T,
-  structIds: T[],
-  structByIdMap: Map<string, AnySubsocialData | PostWithAllDetails>
-) => {
-  const struct = structByIdMap.get(id.toString())
-
-  if (!struct) {
-    structIds.push(id)
-  }
-}
-
-export const loadSubsocialDataByESIndex = async (results: EsDataResults[]) => {
-  const spaceById = new Map<string, SpaceData>()
-  const postById = new Map<string, PostWithAllDetails>()
-  const ownerById = new Map<string, ProfileData>()
-
-  const ownerIds: string[] = []
-  const spaceIds: BN[] = []
-  const postIds: BN[] = []
-
-  results.forEach(({ _id, _index }) => {
-    switch (_index) {
-      case ElasticIndex.profiles:
-        return fillArray(_id, ownerIds, ownerById)
-      case ElasticIndex.spaces:
-        return fillArray(new BN(_id), spaceIds, spaceById)
-      case ElasticIndex.posts:
-        return fillArray(new BN(_id), postIds, postById)
-    }
-  })
-
-  const subsocial = await resolveSubsocialApi()
-
-  const postsData = await subsocial.findPublicPostsWithAllDetails(postIds)
-
-  const ownersData = await subsocial.findProfiles(ownerIds)
-
-  const spacesData = await subsocial.findPublicSpaces(spaceIds)
-
-  function fillMap<T extends AnySubsocialData | PostWithAllDetails>(
-    data: T[],
-    structByIdMap: Map<string, AnySubsocialData | PostWithAllDetails>,
-    structName?: 'profile' | 'post'
-  ) {
-    data.forEach((x) => {
-      let id
-
-      switch (structName) {
-        case 'profile': {
-          id = (x as ProfileData).profile?.created.account
-          break
-        }
-        case 'post': {
-          const struct = (x as PostWithAllDetails).post.struct
-          id = struct.id
-          break
-        }
-        default: {
-          id = (x as SpaceData).struct.id
-        }
-      }
-
-      if (id) {
-        structByIdMap.set(id.toString(), x)
-      }
-    })
-  }
-
-  fillMap(postsData, postById, 'post')
-  fillMap(ownersData, ownerById, 'profile')
-  fillMap(spacesData, spaceById)
-
-  const getFromMaps = ({ _id, _index }: EsDataResults) => {
-    switch (_index) {
-      case ElasticIndex.profiles:
-        return ownerById.get(_id)
-      case ElasticIndex.spaces:
-        return spaceById.get(new BN(_id).toString())
-      case ElasticIndex.posts:
-        return postById.get(new BN(_id).toString())
-    }
-
-    return undefined
-  }
-
-  return results
-    .map((item) => ({
-      index: item._index,
-      id: item._id,
-      data: getFromMaps(item)
-    }))
-    .filter((x) => x.data !== undefined)
 }

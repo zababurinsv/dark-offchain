@@ -1,4 +1,4 @@
-import { Activity, Counts } from '@subsocial/types'
+import { Activity, Counts } from '@darkpay/dark-types'
 import BN from 'bn.js'
 
 export type ActivitiesParams = {

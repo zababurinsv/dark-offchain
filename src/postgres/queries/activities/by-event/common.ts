@@ -1,7 +1,7 @@
 import { ActivitiesParams } from '../../types'
-import { Activity, EventsName } from '@subsocial/types'
+import { Activity, EventsName } from '@darkpay/dark-types'
 import { execPgQuery } from '../../utils'
-import { nonEmptyStr } from '@subsocial/utils'
+import { nonEmptyStr } from '@darkpay/dark-utils'
 
 type ActivitiesByEventParams = ActivitiesParams & {
   events: EventsName[]

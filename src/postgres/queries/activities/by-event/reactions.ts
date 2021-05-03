@@ -1,8 +1,8 @@
 import { GetActivitiesFn, GetCountFn } from '../../types'
 import { getActivitiesByEvent, getActivitiesCountByEvent } from './common'
-import { EventsName } from '@subsocial/types'
+import { EventsName } from '@darkpay/dark-types'
 
-const events: EventsName[] = [ 'CommentReactionCreated', 'PostReactionCreated' ]
+const events: EventsName[] = [ 'CommentReactionCreated', 'ProductReactionCreated' ]
 
 export const getReactionActivitiesData: GetActivitiesFn = (params) =>
   getActivitiesByEvent({ ...params, events })

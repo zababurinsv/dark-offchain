@@ -1,5 +1,5 @@
 import { $loadHtml, parseSiteWithRequest, ParsedSite, getPrettyString, setPrettyString } from './parse-site';
-import { nonEmptyStr, newLogger } from '@subsocial/utils';
+import { nonEmptyStr, newLogger } from '@darkpay/dark-utils';
 
 const log = newLogger('SitePreviewParser')
 

@@ -1,22 +1,25 @@
-import { getPostActivitiesCount } from './by-event/posts'
-import { getSpaceActivitiesCount } from './by-event/spaces'
+import { getProductActivitiesCount } from './by-event/products'
+import { getStorefrontActivitiesCount } from './by-event/storefronts'
+import { getOrderingActivitiesCount } from './by-event/orderings'
 import { getFollowActivitiesCount } from './by-event/follows'
 import { getReactionActivitiesCount } from './by-event/reactions'
 import { getCommentActivitiesCount } from './by-event/comments'
 import { getActivitiesCount } from './all'
-import { Counts } from '@subsocial/types'
+import { Counts } from '@darkpay/dark-types'
 
 export const getActivityCounts = async (account: string): Promise<Counts> => {
   const [
-    postsCount,
-    spacesCount,
+    productsCount,
+    storefrontsCount,
+    orderingsCount,
     followsCount,
     reactionsCount,
     commentsCount,
     activitiesCount
   ] = await Promise.all([
-    getPostActivitiesCount(account),
-    getSpaceActivitiesCount(account),
+    getProductActivitiesCount(account),
+    getStorefrontActivitiesCount(account),
+    getOrderingActivitiesCount(account),
     getFollowActivitiesCount(account),
     getReactionActivitiesCount(account),
     getCommentActivitiesCount(account),
@@ -24,11 +27,12 @@ export const getActivityCounts = async (account: string): Promise<Counts> => {
   ])
 
   return {
-    postsCount,
+    productsCount,
     commentsCount,
     reactionsCount,
     followsCount,
-    spacesCount,
+    storefrontsCount,
+    orderingsCount,
     activitiesCount
   }
 }

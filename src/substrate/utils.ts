@@ -1,9 +1,10 @@
 import { Option } from '@polkadot/types'
-import { Event } from '@polkadot/types/interfaces'
-import { PostId } from '@subsocial/types/substrate/interfaces'
-import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
-import { newLogger } from '@subsocial/utils'
+import { Event } from '@polkadot/types/interfaces';;
+import { newLogger } from '@darkpay/dark-utils'
 import { SubstrateEvent } from './types'
+import BN from 'bn.js';
+import { resolveDarkdotApi } from '../connections/darkdot';
+import dayjs from 'dayjs'
 
 require('dotenv').config()
 
@@ -29,18 +30,18 @@ export function shouldHandleEvent (event: Event): boolean {
   }
 
   return eventsFilterMethods.has(ANY_EVENT) || (
-    eventsFilterSections.has(event.section.toString()) && 
+    eventsFilterSections.has(event.section.toString()) &&
     eventsFilterMethods.has(event.method.toString())
   )
 }
 
 /** Convert id of Substrate struct to `bigint`. */
-export function encodeStructId (id: SubstrateId): bigint {
-  return BigInt(id.toString())
+export function encodeStructId (id: string): bigint {
+  return BigInt(id)
 }
 
 /** Convert ids of Substrate structs to `bigint`s. */
-export function encodeStructIds (ids: SubstrateId[]): bigint[] {
+export function encodeStructIds (ids: string[]): bigint[] {
   try {
     return ids.map(encodeStructId)
   } catch (err) {
@@ -57,18 +58,32 @@ export enum VirtualEvents {
   CommentReplyCreated = 'CommentReplyCreated'
 }
 
-export const parsePostEvent = ({ data }: SubstrateEvent) => {
+export const parseProductEvent = ({ data }: SubstrateEvent) => {
   return {
     author: data[0].toString(),
-    postId: data[1] as PostId
+    productId: data[1].toString()
   }
 }
 
 export const parseCommentEvent = (eventAction: SubstrateEvent) => {
-  const { author, postId: commentId } = parsePostEvent(eventAction)
+  const { author, productId: commentId } = parseProductEvent(eventAction)
   return { author, commentId }
 }
 
 export function stringifyOption(opt: Option<any>): string {
   return opt.unwrapOr(undefined)?.toString()
+}
+
+export const blockNumberToApproxDate = async (eventBlock: BN) => {
+  const { substrate } = await resolveDarkdotApi()
+  const api = await substrate.api
+
+  const blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
+  const currentTimestamp = await api.query.timestamp.now()
+  const block = await api.rpc.chain.getBlock()
+
+  const lastBlockNumber = block.block.header.number.unwrap()
+  const result = currentTimestamp.sub(lastBlockNumber.sub(new BN(eventBlock)).muln(blockTime))
+
+  return dayjs(result.toNumber())
 }

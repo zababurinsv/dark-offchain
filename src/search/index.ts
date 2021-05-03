@@ -1,14 +1,16 @@
 import { elasticIndexer } from '../connections/elastic'
-import * as SpacesMapping from './mappings/spaces.json'
-import * as PostsMapping from './mappings/posts.json'
-import * as ProfilesMapping from './mappings/profiles.json'
-import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config'
+import StorefrontsMapping from './mappings/storefronts.json'
+import ProductsMapping from './mappings/products.json'
+import ProfilesMapping from './mappings/profiles.json'
+import OrderingsMapping from './mappings/orderings.json'
+import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES, ES_INDEX_ORDERINGS } from './config'
 import { elasticLog as log } from '../connections/loggers';
 
 async function maybeCreateIndices () {
-  await createIndexIfNotFound(ES_INDEX_SPACES, SpacesMapping)
-  await createIndexIfNotFound(ES_INDEX_POSTS, PostsMapping)
+  await createIndexIfNotFound(ES_INDEX_SPACES, StorefrontsMapping)
+  await createIndexIfNotFound(ES_INDEX_POSTS, ProductsMapping)
   await createIndexIfNotFound(ES_INDEX_PROFILES, ProfilesMapping)
+  await createIndexIfNotFound(ES_INDEX_ORDERINGS, OrderingsMapping)
 }
 
 async function createIndexIfNotFound (indexName: string, mapping: any) {

@@ -50,7 +50,7 @@ time (
     docker-compose up -d $UTILS
   else
     docker-compose up -d
-    eval docker stop subsocial-offchain &> /dev/null
+    eval docker stop darkdot-offchain &> /dev/null
 
     printf "\nStarting Elasticsearch...\n"
     until curl -s $ES_NODE_URL > /dev/null; do
@@ -66,14 +66,14 @@ time (
   done
   for node in 0 1
   do
-    docker exec subsocial-ipfs$node \
+    docker exec darkdot-ipfs$node \
       ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker exec subsocial-ipfs$node \
+    docker exec darkdot-ipfs$node \
       ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET"]'
-    docker exec subsocial-ipfs$node ipfs bootstrap rm --all &> /dev/null
+    docker exec darkdot-ipfs$node ipfs bootstrap rm --all &> /dev/null
 
     printf "Restarting "
-    docker restart subsocial-ipfs$node
+    docker restart darkdot-ipfs$node
   done
 
   # TODO: Add initial peer as the only one trusted

@@ -1,15 +1,17 @@
-import * as express from 'express'
-import * as bodyParser from 'body-parser'
-import * as cors from 'cors';
+import express from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors';
 import parseSitePreview from '../parser/parse-preview'
-// import { startNotificationsServer } from './ws'
-import * as multer from 'multer';
+import multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
+import * as faucetReqHandlers from './handlers/faucetHandlers'
 import { expressApiLog as log } from '../connections/loggers';
-import * as timeout from 'connect-timeout';
+import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
+import './email/jobs'
+import { port } from '../env';
 
 require('dotenv').config()
 
@@ -20,7 +22,7 @@ app.use(cors((req, callback) => {
   callback(null, { origin })
 }))
 
-function haltOnTimedout (req: express.Request, _res: express.Response, next) {
+function haltOnTimedout(req: express.Request, _res: express.Response, next) {
   if (!req.timedout) next()
 }
 
@@ -35,8 +37,8 @@ app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
 app.use(haltOnTimedout)
 
 // for parsing multipart/form-data
-const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
-app.use(express.static('public'))
+const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
+app.use(express.static('./email/templates'))
 
 // IPFS API
 
@@ -69,8 +71,8 @@ app.get('/v1/offchain/activities/:id/count', pgReqHandlers.activitiesCountHandle
 app.get('/v1/offchain/activities/:id/comments', pgReqHandlers.commentActivitiesHandler)
 app.get('/v1/offchain/activities/:id/comments/count', pgReqHandlers.commentActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/posts', pgReqHandlers.postActivitiesHandler)
-app.get('/v1/offchain/activities/:id/posts/count', pgReqHandlers.postActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/products', pgReqHandlers.productActivitiesHandler)
+app.get('/v1/offchain/activities/:id/products/count', pgReqHandlers.productActivitiesCountHandler)
 
 app.get('/v1/offchain/activities/:id/follows', pgReqHandlers.followActivitiesHandler)
 app.get('/v1/offchain/activities/:id/follows/count', pgReqHandlers.followActivitiesCountHandler)
@@ -78,12 +80,54 @@ app.get('/v1/offchain/activities/:id/follows/count', pgReqHandlers.followActivit
 app.get('/v1/offchain/activities/:id/reactions', pgReqHandlers.reactionActivitiesHandler)
 app.get('/v1/offchain/activities/:id/reactions/count', pgReqHandlers.reactionActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/spaces', pgReqHandlers.spaceActivitiesHandler)
-app.get('/v1/offchain/activities/:id/spaces/count', pgReqHandlers.spaceActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/storefronts', pgReqHandlers.storefrontActivitiesHandler)
+app.get('/v1/offchain/activities/:id/storefronts/count', pgReqHandlers.storefrontActivitiesCountHandler)
 
 app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandler)
 
-app.post('/v1/offchain/notifications/:id/readAll', pgReqHandlers.markAllNotifsAsRead)
+
+app.post('/v1/offchain/accounts/setSessionKey', pgReqHandlers.setSessionKeyHandler)
+
+app.get('/v1/offchain/accounts/getSessionKey', pgReqHandlers.getSessionKeyHandler)
+
+app.get('/v1/offchain/accounts/getNonce', pgReqHandlers.getNonceHandler)
+
+
+app.post('/v1/offchain/telegram/setTelegramData', pgReqHandlers.setTelegramDataHandler)
+
+app.post('/v1/offchain/telegram/setCurrentAccount', pgReqHandlers.setCurrentAccountHandler)
+
+app.post('/v1/offchain/telegram/setLastPush', pgReqHandlers.setLastPushHandler)
+
+app.get('/v1/offchain/telegram/getAccountByChatId/:chatId', pgReqHandlers.getAccountByChatIdHandler)
+
+app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHandler)
+
+app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
+
+app.post('/v1/offchain/email/addEmailSettings', pgReqHandlers.addEmailSettingsHandler)
+
+app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHandler)
+
+app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirmationLetterHandler)
+
+app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailForSettingsHandler)
+
+app.post('/v1/offchain/email/clearConfirmDate', pgReqHandlers.clearConfirmationDateHandler)
+
+
+app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
+
+app.get('/v1/offchain/stats/getActivityCount', pgReqHandlers.getActivityCountByEventHandler)
+
+app.get('/v1/offchain/stats/getActivityCountForToday', pgReqHandlers.getActivityCountForTodayHandler)
+
+
+app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
+
+app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
+
+app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
@@ -91,9 +135,6 @@ app.post('/offchain/parser/', async (req: express.Request, res: express.Response
   res.send(data);
 })
 
-// startNotificationsServer()
-
-const port = process.env.OFFCHAIN_SERVER_PORT
-app.listen(port, () => {
+export const startHttpServer = () => app.listen(port, () => {
   log.info(`HTTP server started on port ${port}`)
 })

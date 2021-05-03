@@ -1,0 +1,52 @@
+<table class="feed-item">
+  <tr>
+    <td class="top">
+      <table {{#if ext }}class="w-100"{{/if}}>
+        <tr>
+          <td class="top">
+            {{> productAuthor
+              avatar=avatar
+              ownerName=ownerName
+              storefrontName=storefrontName
+              date=date
+            }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {{> productContent title=productTitle summary=productSummary }}
+            {{#if ext }}
+              <table class="feed-item">
+                <tr>
+                  <td class="top">
+                    <table>
+                      <tr>
+                        <td class="top">
+                          {{> productAuthor
+                            avatar=ext.avatar
+                            ownerName=ext.ownerName
+                            storefrontName=ext.storefrontName
+                            date=ext.date
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          {{> productContent title=ext.productTitle summary=ext.productSummary }}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                    {{> productImg image=ext.image }}
+                </tr>
+              </table>
+            {{/if}}
+          </td>
+        </tr>
+      </table>
+    </td>
+    {{#unless ext}}
+      {{> productImg image=image }}
+    {{/unless}}
+  </tr>
+</table>

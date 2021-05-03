@@ -1,4 +1,4 @@
-import { newLogger } from '@subsocial/utils'
+import { newLogger } from '@darkpay/dark-utils'
 
 export const expressApiLog = newLogger('Express API')
 export const substrateLog = newLogger('Substrate')

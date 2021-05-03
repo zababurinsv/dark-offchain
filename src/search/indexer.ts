@@ -1,10 +1,10 @@
 
 import { AccountId } from '@polkadot/types/interfaces'
-import { PostContent, ProfileContent, SpaceContent } from '@subsocial/types/offchain'
-import { ElasticIndex, ElasticIndexName, ElasticPostDoc, ElasticProfileDoc, ElasticSpaceDoc } from '@subsocial/types/offchain/search'
-import { Post, PostId, Profile, Space, SpaceId } from '@subsocial/types/substrate/interfaces'
-import { isEmptyObj } from '@subsocial/utils'
-import { resolveSubsocialApi } from '../connections'
+import { ProductContent, ProfileContent, StorefrontContent, OrderingContent } from '@darkpay/dark-types/offchain'
+import { ElasticIndex, ElasticIndexName, ElasticProductDoc, ElasticProfileDoc, ElasticStorefrontDoc, ElasticOrderingDoc } from '@darkpay/dark-types/offchain/search'
+import { Product, ProductId, Profile, Storefront, StorefrontId, Ordering, OrderingId } from '@darkpay/dark-types/substrate/interfaces'
+import { isEmptyObj } from '@darkpay/dark-utils'
+import { resolveDarkdotApi } from '../connections'
 import { elasticIndexer } from '../connections/elastic'
 import { getContentFromIpfs } from '../ipfs'
 import { stringifyOption } from '../substrate/utils'
@@ -20,12 +20,25 @@ async function getProfileDoc(profile: Profile): Promise<ElasticProfileDoc | unde
   }
 }
 
-async function getSpaceDoc(space: Space): Promise<ElasticSpaceDoc | undefined> {
-  const content = await getContentFromIpfs<SpaceContent>(space)
+async function getOrderingDoc(ordering: Ordering): Promise<ElasticOrderingDoc | undefined> {
+  const content = await getContentFromIpfs<OrderingContent>(ordering)
+  if (!content) return undefined
+
+  const { orderingcontent_total, orderingcontent_state } = content
+ // const handle = stringifyOption(ordering.handle)
+
+  return {
+    orderingcontent_total, 
+    orderingcontent_state
+  }
+}
+
+async function getStorefrontDoc(storefront: Storefront): Promise<ElasticStorefrontDoc | undefined> {
+  const content = await getContentFromIpfs<StorefrontContent>(storefront)
   if (!content) return undefined
 
   const { name, about, tags } = content
-  const handle = stringifyOption(space.handle)
+  const handle = stringifyOption(storefront.handle)
 
   return {
     name,
@@ -35,26 +48,26 @@ async function getSpaceDoc(space: Space): Promise<ElasticSpaceDoc | undefined> {
   }
 }
 
-async function getPostDoc(post: Post): Promise<ElasticPostDoc | undefined> {
-  const content = await getContentFromIpfs<PostContent>(post)
+async function getProductDoc(product: Product): Promise<ElasticProductDoc | undefined> {
+  const content = await getContentFromIpfs<ProductContent>(product)
   if (!content) return undefined
 
-  const { substrate } = await resolveSubsocialApi()
-  const { space_id, extension } = post
+  const { substrate } = await resolveDarkdotApi()
+  const { storefront_id, extension } = product
   const { title, body, tags } = content
 
-  let spaceId: string
+  let storefrontId: string
 
   if (extension.isComment) {
-    const rootPostId = extension.asComment.root_post_id
-    const rootPost = await substrate.findPost({ id: rootPostId })
-    spaceId = stringifyOption(rootPost.space_id)
+    const rootProductId = extension.asComment.root_product_id
+    const rootProduct = await substrate.findProduct({ id: rootProductId })
+    storefrontId = stringifyOption(rootProduct.storefront_id)
   } else {
-    spaceId = stringifyOption(space_id)
+    storefrontId = stringifyOption(storefront_id)
   }
 
   return {
-    spaceId,
+    storefrontId,
     title,
     body,
     tags,
@@ -62,13 +75,14 @@ async function getPostDoc(post: Post): Promise<ElasticPostDoc | undefined> {
 }
 
 type AnyElasticDoc =
-  ElasticProfileDoc | 
-  ElasticSpaceDoc | 
-  ElasticPostDoc
+  ElasticProfileDoc |
+  ElasticStorefrontDoc |
+  ElasticProductDoc |
+  ElasticOrderingDoc
 
 type IndexContentProps = {
   index: ElasticIndexName
-  id: AccountId | SpaceId | PostId
+  id: AccountId | StorefrontId | ProductId | OrderingId
   doc: AnyElasticDoc
 }
 
@@ -90,18 +104,26 @@ export async function indexProfileContent(profile: Profile) {
   })
 }
 
-export async function indexSpaceContent(space: Space) {
+export async function indexStorefrontContent(storefront: Storefront) {
   return indexContent({
-    index: ElasticIndex.spaces,
-    id: space.id,
-    doc: await getSpaceDoc(space)
+    index: ElasticIndex.storefronts,
+    id: storefront.id,
+    doc: await getStorefrontDoc(storefront)
   })
 }
 
-export async function indexPostContent(post: Post) {
+export async function indexProductContent(product: Product) {
   return indexContent({
-    index: ElasticIndex.posts,
-    id: post.id,
-    doc: await getPostDoc(post)
+    index: ElasticIndex.products,
+    id: product.id,
+    doc: await getProductDoc(product)
+  })
+}
+
+export async function indexOrderingContent(ordering: Ordering) {
+  return indexContent({
+    index: ElasticIndex.orderings,
+    id: ordering.id,
+    doc: await getOrderingDoc(ordering)
   })
 }

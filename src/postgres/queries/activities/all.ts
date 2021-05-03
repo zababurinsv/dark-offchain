@@ -1,5 +1,5 @@
 import { ActivitiesParams, GetActivitiesFn, GetCountFn } from "../types"
-import { Activity } from "@subsocial/types"
+import { Activity } from "@darkpay/dark-types"
 import { execPgQuery } from "../utils"
 
 const pageQuery = 

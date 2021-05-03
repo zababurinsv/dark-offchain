@@ -1,37 +1,36 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrateLog as log } from '../../connections/loggers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
-import { substrate } from '../../connections/subsocial';
 import { insertCommentFollower } from '../inserts/insertCommentFollower';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
-import { fillNotificationsWithPostFollowers } from '../fills/fillNotificationsWithPostFollowers';
+import { fillNotificationsWithProductFollowers } from '../fills/fillNotificationsWithProductFollowers';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
+import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
+import { findProduct } from '../../substrate/api-wrappers';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
-export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onCommentCreated = async (eventAction: SubstrateEvent, product: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)
 
-  const {
-    extension: { asComment: { root_post_id, parent_id } },
-  } = post
+  const { parentId, rootProductId } = asNormalizedComment(product)
 
-  const rootPost = await substrate.findPost({ id: root_post_id });
+  const rootProduct = await findProduct(rootProductId);
 
-  if (!rootPost) return;
+  if (!rootProduct) return;
 
   await insertCommentFollower(eventAction.data);
 
-  const postCreator = rootPost.created.account.toString();
-  const ids = [ root_post_id, commentId ];
+  const productCreator = rootProduct.createdByAccount;
+  const ids = [rootProductId, commentId];
 
-  if (parent_id.isSome) {
+  if (parentId) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
-    const parentId = parent_id.unwrap();
+    // const parentId = parentId.unwrap();
     const param = [...ids, parentId];
-    const parentComment = await substrate.findPost({ id: parentId });
+    const parentComment = await findProduct(parentId);
 
     const parentOwner = parentComment.owner.toString();
     const insertResult = await insertActivityForComment(eventAction, param, author);
@@ -40,11 +39,12 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
     await insertNotificationForOwner({ ...insertResult, account: parentOwner });
   } else {
     eventAction.eventName = VirtualEvents.CommentCreated
-    const insertResult = await insertActivityForComment(eventAction, ids, postCreator);
+    const insertResult = await insertActivityForComment(eventAction, ids, productCreator);
     if (insertResult === undefined) return;
 
     log.debug('Comment does not have a parent id');
-    await fillNotificationsWithPostFollowers(root_post_id, { account: author, ...insertResult });
+    await fillNotificationsWithProductFollowers(rootProductId, { account: author, ...insertResult }, productCreator);
     await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
+    informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), productCreator, insertResult.blockNumber, insertResult.eventIndex, 'notification')
   }
 }

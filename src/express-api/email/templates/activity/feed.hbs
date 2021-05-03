@@ -1,0 +1,18 @@
+
+{{#each data}}
+<tr>
+  <td>
+    <a class="text" href="{{productLink}}">
+      {{> feedItem
+        avatar=avatar
+        ownerName=ownerName
+        storefrontName=storefrontName
+        date=date
+        productTitle=productTitle
+        productSummary=productSummary
+        image=image
+      }}
+    </a>
+  </td>
+</tr>
+{{/each}}

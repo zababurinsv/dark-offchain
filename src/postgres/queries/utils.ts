@@ -1,9 +1,9 @@
-import { newLogger } from "@subsocial/utils"
+import { newLogger } from "@darkpay/dark-utils"
 import { pg } from '../../connections/postgres'
 
 const log = newLogger('PgQuery')
 
-/** Execute PostgreSQL query and return result data. */
+/** Execute ProductgreSQL query and return result data. */
 export const execPgQuery = async (
   query: string,
   params: any[],

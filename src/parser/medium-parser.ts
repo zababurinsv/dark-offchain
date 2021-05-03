@@ -1,6 +1,6 @@
 import parseMedium from "./parse-medium"
 import { writeFileSync } from 'fs'
-import { newLogger, nonEmptyStr, isEmptyArray } from '@subsocial/utils'
+import { newLogger, nonEmptyStr, isEmptyArray } from '@darkpay/dark-utils'
 const csv = require('csvtojson')
 
 const log = newLogger('SitePreviewParser')

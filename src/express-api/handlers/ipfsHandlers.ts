@@ -1,9 +1,9 @@
 import * as express from 'express'
-import { newLogger, nonEmptyStr } from '@subsocial/utils'
+import { newLogger, nonEmptyStr } from '@darkpay/dark-utils'
 import { ipfsCluster } from '../../connections/ipfs'
 import { maxFileSizeBytes, maxFileSizeMB } from '../config'
-import { resolveSubsocialApi } from '../../connections'
-import { asIpfsCid } from '@subsocial/api/utils'
+import { resolveDarkdotApi } from '../../connections'
+import { asIpfsCid } from '@darkpay/dark-api/utils'
 
 const log = newLogger('IPFS req handler')
 
@@ -22,12 +22,11 @@ export const addContent = async (req: express.Request, res: express.Response) =>
 const getContentResponse = async (res: express.Response, cids: string[]) => {
   try {
     const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
-    const { ipfs } = await resolveSubsocialApi()
+    const { ipfs } = await resolveDarkdotApi()
     const contents = await ipfs.getContentArrayFromIpfs(ipfsCids)
     log.info(`${contents.length} content items loaded from IPFS`)
     res.json(contents)
   } catch (err) {
-    // console.log(err)
     res.json(err)
   }
 }

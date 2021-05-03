@@ -3,14 +3,14 @@ version: "3"
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
-    container_name: subsocial-elasticsearch
+    container_name: darkdot-elasticsearch
     restart: on-failure
     environment:
       ES_JAVA_OPTS: "-Xms512m -Xmx1024m"
       MAX_MAP_COUNT: "64000"
       discovery.type: "single-node"
-      cluster.name: "subsocial-cluster"
-      node.name: "subsocial-node"
+      cluster.name: "darkdot-cluster"
+      node.name: "darkdot-node"
       http.port: "9200"
       http.cors.enabled: "true"
       http.cors.allow-credentials: "true"
@@ -23,10 +23,10 @@ services:
 
   postgres:
     image: postgres
-    container_name: subsocial-postgres
+    container_name: darkdot-postgres
     restart: on-failure
     environment:
-      POSTGRES_DB: subsocial
+      POSTGRES_DB: darkdot
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: 1986
     volumes:
@@ -38,7 +38,7 @@ services:
 
   ipfs0:
     image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs0
+    container_name: darkdot-ipfs0
     restart: on-failure
     ports:
       - "4001:4001"
@@ -50,11 +50,11 @@ services:
 
   ipfs-cluster:
     image: ipfs/ipfs-cluster:latest
-    container_name: subsocial-ipfs-cluster
+    container_name: darkdot-ipfs-cluster
     depends_on:
       - ipfs0
     environment:
-      CLUSTER_PEERNAME: "Subsocial Cluster"
+      CLUSTER_PEERNAME: "Darkdot Cluster"
       CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
       CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs0/tcp/5001
       CLUSTER_CRDT_TRUSTERPEERS: '*' # Trust all peers in Cluster (initially)
@@ -71,7 +71,7 @@ services:
 
   ipfs1:
     image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs1
+    container_name: darkdot-ipfs1
     restart: on-failure
     volumes:
       - peer_staging:/export
@@ -79,11 +79,11 @@ services:
 
   ipfs-peer:
     image: ipfs/ipfs-cluster:latest
-    container_name: subsocial-ipfs-peer
+    container_name: darkdot-ipfs-peer
     depends_on:
       - ipfs1
     environment:
-      CLUSTER_PEERNAME: "Subsocial Peer"
+      CLUSTER_PEERNAME: "Darkdot Peer"
       CLUSTER_SECRET: ${CLUSTER_SECRET}
       CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs1/tcp/5001
       CLUSTER_CRDT_TRUSTERPEERS: '*'
@@ -98,8 +98,8 @@ services:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
-    image: dappforce/subsocial-offchain:latest
-    container_name: subsocial-offchain
+    image: dappforce/darkdot-offchain:latest
+    container_name: darkdot-offchain
     depends_on:
       - postgres
       - elasticsearch

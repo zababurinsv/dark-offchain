@@ -1,13 +1,13 @@
-import { resolveCidOfContent } from '@subsocial/api'
-import { CommonContent } from '@subsocial/types/offchain'
-import { Post, Profile, Space } from '@subsocial/types/substrate/interfaces'
-import { resolveSubsocialApi } from '../connections'
+import { resolveCidOfContent } from '@darkpay/dark-api'
+import { CommonContent } from '@darkpay/dark-types/offchain'
+import { Ordering, Product, Profile, Storefront } from '@darkpay/dark-types/substrate/interfaces'
+import { resolveDarkdotApi } from '../connections'
 import { ipfsLog as log } from '../connections/loggers'
 
-type Struct = Post | Space | Profile
+type Struct = Product | Storefront | Profile | Ordering
 
 export async function getContentFromIpfs<T extends CommonContent>(struct: Struct): Promise<T | undefined> {
-  const { ipfs } = await resolveSubsocialApi()
+  const { ipfs } = await resolveDarkdotApi()
   const cid = resolveCidOfContent(struct.content)
 
   return ipfs.getContent<T>(cid)

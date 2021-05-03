@@ -1,24 +1,24 @@
 import { SubstrateEvent } from '../../substrate/types';
-import { Post } from '@subsocial/types/substrate/interfaces';
-import { substrate } from '../../connections/subsocial';
-import { parsePostEvent } from '../../substrate/utils';
+import { parseProductEvent } from '../../substrate/utils';
+import { findProduct } from '../../substrate/api-wrappers';
+import { NormalizedProduct } from '../../substrate/normalizers';
 
-type PostHandler = (eventAction: SubstrateEvent, post?: Post) => Promise<void>
+type ProductHandler = (eventAction: SubstrateEvent, product?: NormalizedProduct) => Promise<void>
 
-type PostHandlers = {
+type ProductHandlers = {
   eventAction: SubstrateEvent
-  onRootPost: PostHandler
-  onComment: PostHandler
+  onRootProduct: ProductHandler
+  onComment: ProductHandler
 }
 
-export const findPostAndProccess = async ({ eventAction, onRootPost, onComment }: PostHandlers) => {
-  const { postId } = parsePostEvent(eventAction)
-  const post = await substrate.findPost({ id: postId })
-  if (!post) return;
+export const findProductAndProccess = async ({ eventAction, onRootProduct, onComment }: ProductHandlers) => {
+  const { productId } = parseProductEvent(eventAction)
+  const product = await findProduct(productId)
+  if (!product) return;
 
-  if (post.extension.isComment) {
-    onComment(eventAction, post)
+  if (product.isComment) {
+    await onComment(eventAction, product)
   } else {
-    onRootPost(eventAction, post)
+    await onRootProduct(eventAction, product)
   }
 }
