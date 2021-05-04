@@ -22,7 +22,9 @@ BEGIN
             'ProductReactionCreated',
             'ProductReactionUpdated',
             'CommentReactionCreated',
-            'CommentReactionUpdated'
+            'CommentReactionUpdated',
+            'OrderingCreated',
+            'OrderingUpdated'
         );
     END IF;
 END$$;
@@ -36,6 +38,7 @@ CREATE TABLE IF NOT EXISTS df.activities
     following_id varchar(48) NULL,
     storefront_id bigint NULL,
     product_id bigint NULL,
+    ordering_id bigint NULL,
     comment_id bigint NULL,
     parent_comment_id bigint NULL,
     date TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -152,6 +155,9 @@ ON df.activities(comment_id);
 
 CREATE INDEX IF NOT EXISTS idx_parent_comment_id
 ON df.activities(parent_comment_id);
+
+CREATE INDEX IF NOT EXISTS idx_ordering_id
+ON df.activities(ordering_id);
 
 -- CREATE INDEX IF NOT EXISTS idx_aggregated
 -- ON df.activities(aggregated);
