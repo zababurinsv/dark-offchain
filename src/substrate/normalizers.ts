@@ -77,7 +77,6 @@ export type NormalizedStorefront = NormalizedStorefrontOrProduct & {
   visibleProductsCount: number
   followersCount: number
   score: number
-  private: boolean
   // permissions?: StorefrontPermissions
 }
 
@@ -205,7 +204,6 @@ export function normalizeStorefrontStruct(struct: Storefront): NormalizedStorefr
     visibleProductsCount,
     followersCount: struct.followers_count.toNumber(),
     score: struct.score.toNumber(),
-    private: struct.hidden.isFalse,
   }
 }
 
