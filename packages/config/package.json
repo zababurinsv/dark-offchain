@@ -1,0 +1,35 @@
+{
+  "name": "@darkpay/dark-config",
+  "version": "0.4.25",
+  "description": "JavaScript config files for Darkdot blockchain.",
+  "author": "DarkDot contributors",
+  "license": "GPL-3.0-only",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DarkPayCoin/darkdot-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DarkPayCoin/darkdot-sdk/issues"
+  },
+  "homepage": "https://github.com/DarkPayCoin/darkdot-sdk",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.6.1",
+    "@typescript-eslint/parser": "^4.6.1",
+    "eslint": "^7.12.1"
+  },
+  "keywords": [
+    "dark",
+    "darkdot",
+    "substrate",
+    "polkadot",
+    "kusama",
+    "eslint"
+  ]
+}

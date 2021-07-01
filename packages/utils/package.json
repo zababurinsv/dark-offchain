@@ -1,0 +1,50 @@
+{
+  "name": "@darkpay/dark-utils",
+  "version": "0.4.39.2",
+  "description": "JavaScript utils for Darkdot blockchain.",
+  "author": "DarkPayCoin contributors",
+  "main": "build/index.js",
+  "license": "GPL-3.0-only",
+  "publishConfig": {
+    "access": "public",
+    "directory": "src",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DarkPayCoin/darkdot-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DarkPayCoin/darkdot-sdk/issues"
+  },
+  "homepage": "https://github.com/DarkPayCoin/darkdot-sdk",
+  "dependencies": {
+    "@sindresorhus/slugify": "^1.1.0",
+    "bn.js": "^5.1.1",
+    "chalk": "^3.0.0",
+    "dotenv": "^8.0.0",
+    "lodash.isempty": "^4.4.0",
+    "lodash.truncate": "^4.4.2",
+    "loglevel": "^1.7.0",
+    "loglevel-plugin-prefix": "^0.8.4",
+    "remark": "^13.0.0",
+    "strip-markdown": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/circular-json": "^0.4.0",
+    "@types/lodash.isempty": "^4.4.6",
+    "@types/lodash.truncate": "^4.4.6",
+    "@types/loglevel": "^1.6.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch"
+  },
+  "keywords": [
+    "dark",
+    "darkdot",
+    "substrate",
+    "polkadot",
+    "kusama"
+  ]
+}

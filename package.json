@@ -8,6 +8,9 @@
   "engines": {
     "node": ">= 12.13"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start": "concurrently \"node ./build/src/index.js\" \"yarn init-search\"",
     "subscribe": "node ./build/src/substrate/index.js",

@@ -1,0 +1,40 @@
+{
+  "name": "@darkpay/dark-api",
+  "version": "0.4.37.13",
+  "description": "JavaScript API for Darkdot blockchain.",
+  "author": "DarkDot contributors",
+  "license": "GPL-3.0-only",
+  "publishConfig": {
+    "access": "public",
+    "directory": "src",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DarkPayCoin/darkdot-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DarkPayCoin/darkdot-sdk/issues"
+  },
+  "homepage": "https://github.com/DarkPayCoin/darkdot-sdk",
+  "dependencies": {
+    "@polkadot/api": "^3.8.1",
+    "@darkpay/dark-utils": "^0.4.3-9.2",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "@darkpay/dark-types": "^0.4.3-6.11"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch"
+  },
+  "keywords": [
+    "dark",
+    "darkdot",
+    "substrate",
+    "polkadot",
+    "kusama",
+    "ipfs"
+  ]
+}
