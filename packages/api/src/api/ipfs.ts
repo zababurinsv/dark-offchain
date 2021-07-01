@@ -128,7 +128,7 @@ export class DarkdotIpfsApi {
 
   async getContentArrayFromOffchain<T extends CommonContent> (cids: IpfsCid[], contentName = 'content'): Promise<ContentResult<T>> {
     try {
-      
+
       const res = this.useServer?.httpRequestMethod === 'get'
         ? await axios.get(`${this.offchainUrl}/ipfs/get?cids=${cids.join('&cids=')}`)
         : await axios.post(`${this.offchainUrl}/ipfs/get`, { cids })

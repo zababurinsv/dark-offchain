@@ -20,11 +20,11 @@
   "homepage": "https://github.com/DarkPayCoin/darkdot-sdk",
   "dependencies": {
     "@darkpay/dark-utils": "^0.4.3-9.2",
-    "cids": "^0.7.1"
+    "cids": "^1.1.7"
   },
   "devDependencies": {
-    "@polkadot/typegen": "^3.8.1",
-    "@polkadot/types": "^3.8.1"
+    "@polkadot/typegen": "^4.16.2",
+    "@polkadot/types": "^4.16.2"
   },
   "scripts": {
     "build": "tsc",

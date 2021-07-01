@@ -88,11 +88,9 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/prefer-interface': 'off',
     '@typescript-eslint/no-object-literal-type-assertion': 'off',
     '@typescript-eslint/camelcase': 'off',
-    'react/prop-types': 'off',
     '@typescript-eslint/array-type': 'off',
 
     '@typescript-eslint/no-var-requires': 'off',

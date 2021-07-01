@@ -1,0 +1,10 @@
+import { ProfileData } from '@subsocial/types/src';
+export declare const mockSocialAccountAlice: any;
+export declare const mockProfileAlice: any;
+export declare const mockContentAlice: any;
+export declare const mockProfileDataAlice: any;
+export declare const mockSocialAccountBob: any;
+export declare const mockProfileBob: any;
+export declare const mockContentBob: any;
+export declare const mockProfileDataBob: any;
+export declare const profilesData: ProfileData[];
