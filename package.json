@@ -40,16 +40,16 @@
     "build:types": "lerna run build --scope=@darkpay/dark-types --include-filtered-dependencies",
     "build:utils": "lerna run build --scope=@darkpay/dark-utils --include-filtered-dependencies",
     "build:api": "lerna run build --scope=@darkpay/dark-api --include-filtered-dependencies",
+    "clean:sdk": "lerna clean && yarn clean:build",
+    "clean:modules": "lerna clean",
+    "clean:build": "find . -name \"build\" -type d -prune -exec rm -rf '{}' +",
+    "test:sdk": "jest --verbose",
+    "product:install": "lerna bootstrap --force-local && lerna link --force-local",
     "publish:config": "./scripts/publish-config.sh",
     "publish:types": "yarn build:types && ./scripts/publish-types.sh",
     "publish:utils": "yarn build:utils && ./scripts/publish-utils.sh",
     "publish:api": "yarn build:api && ./scripts/publish-api.sh",
-    "publish:all": "yarn build && ./scripts/publish-all.sh",
-    "clean:sdk": "lerna clean && yarn clean:build",
-    "clean:modules": "lerna clean",
-    "clean:build": "find . -name \"build\" -type d -prune -exec rm -rf '{}' +",
-    "testLsdk": "jest --verbose",
-    "productinstall": "lerna bootstrap --force-local && lerna link --force-local"
+    "publish:all": "yarn build && ./scripts/publish-all.sh"
   },
   "devDependencies": {
     "@types/bn.js": "^4.11.5",

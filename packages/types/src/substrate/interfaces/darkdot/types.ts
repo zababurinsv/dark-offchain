@@ -2,10 +2,10 @@
 /* eslint-disable */
 
 import type { BTreeSet, Enum, Option, Struct, Text, Vec, bool, i32, u16, u32, u64, u8 } from '@polkadot/types';
-import type { AccountId, Balance, BlockNumber, Moment } from '@polkadot/types/interfaces/runtime';
+import type { AccountId, Balance, BlockNumber, Moment, MultiAddress } from '@polkadot/types/interfaces/runtime';
 
 /** @name Address */
-export interface Address extends AccountId {}
+export interface Address extends MultiAddress {}
 
 /** @name BountyIndex */
 export interface BountyIndex extends u32 {}
@@ -100,6 +100,8 @@ export interface EntityId extends Enum {
   readonly asStorefront: StorefrontId;
   readonly isProduct: boolean;
   readonly asProduct: ProductId;
+  readonly isOrdering: boolean;
+  readonly asOrdering: OrderingId;
 }
 
 /** @name EntityStatus */
@@ -142,7 +144,56 @@ export interface FaucetUpdate extends Struct {
 export interface IpfsCid extends Text {}
 
 /** @name LookupSource */
-export interface LookupSource extends AccountId {}
+export interface LookupSource extends MultiAddress {}
+
+/** @name Ordering */
+export interface Ordering extends Struct {
+  readonly id: OrderingId;
+  readonly created: WhoAndWhen;
+  readonly updated: Option<WhoAndWhen>;
+  readonly owner: AccountId;
+  readonly ordering_state: OrderingState;
+  readonly ordering_total: Balance;
+  readonly seller: AccountId;
+  readonly buyer_escrow: Balance;
+  readonly seller_escrow: Balance;
+  readonly storefront_id: Option<StorefrontId>;
+  readonly product_id: ProductId;
+  readonly content: Content;
+}
+
+/** @name OrderingHistoryRecord */
+export interface OrderingHistoryRecord extends Struct {
+  readonly edited: WhoAndWhen;
+  readonly old_data: OrderingUpdate;
+}
+
+/** @name OrderingId */
+export interface OrderingId extends u64 {}
+
+/** @name OrderingState */
+export interface OrderingState extends Enum {
+  readonly isNew: boolean;
+  readonly isPending: boolean;
+  readonly isAccepted: boolean;
+  readonly isRefused: boolean;
+  readonly isShipped: boolean;
+  readonly isComplete: boolean;
+  readonly isRefunded: boolean;
+  readonly isDispute: boolean;
+  readonly isSlashedBuyer: boolean;
+  readonly isSlashedSeller: boolean;
+  readonly isSlashedBoth: boolean;
+}
+
+/** @name OrderingUpdate */
+export interface OrderingUpdate extends Struct {
+  readonly content: Option<Content>;
+  readonly ordering_state: OrderingState;
+}
+
+/** @name Prices */
+export interface Prices extends Vec<u32> {}
 
 /** @name Product */
 export interface Product extends Struct {
@@ -152,8 +203,8 @@ export interface Product extends Struct {
   readonly owner: AccountId;
   readonly extension: ProductExtension;
   readonly storefront_id: Option<StorefrontId>;
+  readonly price: Option<u32>;
   readonly content: Content;
-  readonly price: Option<u32>,
   readonly hidden: bool;
   readonly replies_count: u16;
   readonly hidden_replies_count: u16;
@@ -184,60 +235,9 @@ export interface ProductId extends u64 {}
 /** @name ProductUpdate */
 export interface ProductUpdate extends Struct {
   readonly storefront_id: Option<StorefrontId>;
+  readonly price: Option<u32>;
   readonly content: Option<Content>;
-  readonly price: Option<u32>,
   readonly hidden: Option<bool>;
-}
-
-/** @name Prices */
-export interface Prices extends Enum {}
-
-
-/** @name OrderingId */
-export interface OrderingId extends u64 {
-}
-/** @name Ordering */
-export interface Ordering extends Struct {
-  readonly id: OrderingId;
-  readonly created: WhoAndWhen;
-  readonly updated: Option<WhoAndWhen>;
-  readonly owner: AccountId;
-  readonly ordering_state: OrderingState;
-  readonly ordering_total: Balance;
-  readonly seller: AccountId;
-  readonly buyer_escrow: Balance;
-  readonly seller_escrow: Balance;
-  readonly storefront_id: Option<StorefrontId>;
-  readonly product_id: ProductId;
-  readonly content: Content;
-}
-
-
-/** @name OrderingUpdate */
-export interface OrderingUpdate extends Struct {
-  readonly ordering_state: OrderingState;
-  readonly content: Option<Content>;
-}
-
-/** @name OrderingState */
-export interface OrderingState extends Enum {
-  readonly isNew: boolean;
-  readonly isPending: boolean;
-  readonly isAccepted: boolean;
-  readonly isRefused: boolean;
-  readonly isShipped: boolean;
-  readonly isComplete: boolean;
-  readonly isRefunded: boolean;
-  readonly isDispute: boolean;
-  readonly isSlashedBuyer: boolean;
-  readonly isSlashedSeller: boolean;
-  readonly isSlashedBoth: boolean;
-}
-
-/** @name OrderingHistoryRecord */
-export interface OrderingHistoryRecord extends Struct {
-  readonly edited: WhoAndWhen;
-  readonly old_data: OrderingUpdate;
 }
 
 /** @name Profile */
@@ -513,4 +513,4 @@ export interface WhoAndWhen extends Struct {
   readonly time: Moment;
 }
 
-export type PHANTOM_SUBSOCIAL = 'darkdot';
+export type PHANTOM_DARKDOT = 'darkdot';
