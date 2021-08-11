@@ -24,13 +24,16 @@ async function getOrderingDoc(ordering: Ordering): Promise<ElasticOrderingDoc | 
   const content = await getContentFromIpfs<OrderingContent>(ordering)
   if (!content) return undefined
 
-  const { orderingcontent_total, orderingcontent_state } = content
+ // const { orderingcontent_total, orderingcontent_state } = content
  // const handle = stringifyOption(ordering.handle)
 
-  return {
-    orderingcontent_total, 
-    orderingcontent_state
-  }
+  // return {
+  //   orderingcontent_total, 
+  //   orderingcontent_state
+  // }
+  return undefined
+
+
 }
 
 async function getStorefrontDoc(storefront: Storefront): Promise<ElasticStorefrontDoc | undefined> {

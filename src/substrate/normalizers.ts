@@ -57,15 +57,12 @@ type NormalizedStorefrontOrProduct =
 
 
   export type NormalizedOrdering = NormalizedOrderingWithId & {
-    seller: AccountId
     ordering_total: number
     ordering_state: string
+    seller: AccountId
     buyer_escrow: number
     seller_escrow: number
     storefront_id: Id
-    product_id: Id
-    // permissions?: OrderingPermissions
-    // ordering_state ?
   }
 
 
@@ -93,7 +90,7 @@ export type NormalizedProduct = NormalizedStorefrontOrProduct & {
   isRegularProduct: boolean
   isSharedProduct: boolean
   isComment: boolean
-  price: number
+  price_usd: number
 }
 
 type NormalizedSocialAccount = HasId & {
@@ -241,7 +238,7 @@ export function normalizeProductStruct(struct: Product): NormalizedProduct {
     upvotesCount: parseInt(struct.upvotes_count.toString()),
     downvotesCount: parseInt(struct.downvotes_count.toString()),
     score: parseInt(struct.score.toString()),
-    price: parseInt(struct.price.toString()),
+    price_usd: parseInt(struct.price_usd.toString()),
     isRegularProduct,
     isSharedProduct,
     isComment,
@@ -289,23 +286,21 @@ export function normalizeOrderingStruct(struct: Ordering): NormalizedOrdering {
   // const totalProductsCount = struct.products_count.toNumber()
   // const hiddenProductsCount = struct.hidden_products_count.toNumber()
   // const visibleProductsCount = totalProductsCount - hiddenProductsCount
-  const seller = struct.seller
-  const ordering_total = struct.ordering_total.toNumber()
-  const ordering_state = struct.seller.toString()
-  const buyer_escrow = struct.buyer_escrow.toNumber()
-  const seller_escrow = struct.seller_escrow.toNumber()
+  //const ordering_total = struct.ordering_total.toNumber()
+  //const ordering_state = struct.seller.toString()
+  //const seller = struct.seller
+  //const buyer_escrow = struct.buyer_escrow.toNumber()
+  //const seller_escrow = struct.seller_escrow.toNumber()
   const storefront_id = struct.storefront_id.toString()
-  const product_id = struct.product_id.toString()
 
   return {
     ...normalizeOrderingStruct(struct),
-    seller,
-    ordering_total,
-    ordering_state,
-    buyer_escrow,
-    seller_escrow,
+    //ordering_total,
+    //ordering_state,
+    //seller,
+    //buyer_escrow,
+    //seller_escrow,
     storefront_id,
-    product_id
   }
 }
 
